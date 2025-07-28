@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<!-- saved from url=(0032)http://127.0.0.1:5500/index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .balance,
+        .income-expense {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-top: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .amount {
+            font-weight: bold;
+        }
+
+        .positive {
+            color: green;
+        }
+
+        .negative {
+            color: red;
+        }
+
+        .form input,
+        .form button {
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .form button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .form button:hover {
+            background-color: #218838;
+        }
+
+        .delete-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        #transactions {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>💰 Personal Finance Tracker</h2>
+    <div class="balance">
+        <h3>Your Balance</h3>
+        <div id="balance">₹0.00</div>
+    </div>
+    <div class="income-expense">
+        <p>Income: <span id="income">₹0.00</span></p>
+        <p>Expense: <span id="expense">₹0.00</span></p>
+    </div>
+
+    <h3>Add New Transaction</h3>
+    <div class="form">
+        <input type="text" id="description" placeholder="Enter description...">
+        <input type="number" id="amount" placeholder="Enter amount...">
+        <input type="text" id="category" placeholder="Enter category (e.g., Food)">
+        <input type="date" id="date">
+        <input type="time" id="time">
+        <button onclick="addTransaction()">Add Transaction</button>
+    </div>
+
+    <h3>History</h3>
+    <div id="transactions"></div>
+
+    <script>
+        let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+        function updateUI() {
+            const transactionsDiv = document.getElementById("transactions");
+            transactionsDiv.innerHTML = "";
+            let income = 0, expense = 0, balance = 0;
+
+            transactions.forEach((tx, index) => {
+                const div = document.createElement("div");
+                div.classList.add("transaction");
+
+                const sign = tx.amount > 0 ? "+" : "-";
+                const typeClass = tx.amount > 0 ? "positive" : "negative";
+
+                div.innerHTML = `
+          <div>
+            <div>${tx.description || "No description"} - ${tx.category || "Uncategorized"}</div>
+            <div>(${tx.date || "No date"}${tx.time ? " at " + tx.time : ""})</div>
+            <div class="amount ${typeClass}">₹ ${sign}${Math.abs(tx.amount).toFixed(2)}</div>
+          </div>
+          <button class="delete-btn" onclick="deleteTransaction(${index})">Delete</button>
+        `;
+                transactionsDiv.appendChild(div);
+
+                if (tx.amount > 0) income += tx.amount;
+                else expense += Math.abs(tx.amount);
+                balance += tx.amount;
+            });
+
+            document.getElementById("income").innerText = `₹${income.toFixed(2)}`;
+            document.getElementById("expense").innerText = `₹${expense.toFixed(2)}`;
+            document.getElementById("balance").innerText = `₹${balance.toFixed(2)}`;
+
+            localStorage.setItem("transactions", JSON.stringify(transactions));
+        }
+
+        function addTransaction() {
+            const desc = document.getElementById("description").value;
+            const amount = parseFloat(document.getElementById("amount").value);
+            const category = document.getElementById("category").value;
+            const date = document.getElementById("date").value;
+            const time = document.getElementById("time").value;
+
+            if (!amount || isNaN(amount)) {
+                alert("Please enter a valid amount");
+                return;
+            }
+
+            const newTransaction = { description: desc, amount, category, date, time };
+            transactions.push(newTransaction);
+            updateUI();
+
+            // Clear fields after add
+            document.getElementById("description").value = "";
+            document.getElementById("amount").value = "";
+            document.getElementById("category").value = "";
+            document.getElementById("date").value = "";
+            document.getElementById("time").value = "";
+        }
+
+        function deleteTransaction(index) {
+            if (confirm("Are you sure you want to delete this transaction?")) {
+                transactions.splice(index, 1);
+                updateUI();
+            }
+        }
+
+        // Initial load
+        updateUI();
+    </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+
+
+</body></html>
